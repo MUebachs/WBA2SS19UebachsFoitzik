@@ -1,0 +1,15 @@
+{
+  "name": "wba2_praktikum",
+  "version": "1.0.0",
+  "description": "Anwendung zum Zuteilen von Tischen an Kellner und Routenoptimierung",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marco Uebachs",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.0",
+    "firebase-admin": "^7.3.0"
+  }
+}
