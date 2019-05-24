@@ -65,7 +65,7 @@ app.post("/worker", function(request, response){
       if(doc.vergeben == False){
         tisch=doc.id;
       }
-    }
+    });
     if(tisch>0){
       db.collection('worker').doc(p.id).set({
         "nachname"  : p.nachname,
@@ -83,9 +83,8 @@ app.post("/worker", function(request, response){
         "wZeit"     : p.wZeit
       });
     }
-  }
-
   });
+
 
 
 
