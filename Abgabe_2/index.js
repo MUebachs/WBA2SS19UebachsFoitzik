@@ -256,7 +256,6 @@ else {
   .catch((err) => {
     response.json('Error getting documents', err);
   });
-
 }
   db.collection('reservation').doc(p.id).set(newReserv);
   return response.send("Neue Reservierung mit der ID " + p.id + " erstellt.");
@@ -272,15 +271,15 @@ app.patch("/reservation/:id", function(request, response){
     .then(doc => {
 
       if(request.body.datum != null){
-        t.update(reservRef, {datum: request.body.datum});
+        t.update(workerRef, {datum: request.body.datum});
       }
 
       if(request.body.kunde != null){
-        t.update(reservRef, {kunde: request.body.kunde});
+        t.update(workerRef, {kunde: request.body.kunde});
       }
 
       if(request.body.tisch != null){
-        t.update(reservRef, {tisch: request.body.tisch});
+        t.update(workerRef, {tisch: request.body.tisch});
       }
 
     });
@@ -366,11 +365,11 @@ app.patch("/table/:id", function(request, response){
     .then(doc => {
 
       if(request.body.datum != null){
-        t.update(tableRef, {datum: request.body.datum});
+        t.update(workerRef, {datum: request.body.datum});
       }
 
       if(request.body.kunde != null){
-        t.update(tableRef, {kunde: request.body.kunde});
+        t.update(workerRef, {kunde: request.body.kunde});
       }
 
     });
@@ -386,8 +385,8 @@ app.patch("/table/:id", function(request, response){
 //Verb: DELETE / Löscht Reservierung mit bestimmter ID
 app.delete("/table/:id", function(request, response){
 
-  var tableRef = db.collection('table').doc(request.params.id);
-  var getDoc = tableRef.delete();
+  var reservRef = db.collection('table').doc(request.params.id);
+  var getDoc = reservRef.delete();
 
   return response.send("Lösche Reservierung mit der ID" + request.params.id + ".");
 });
