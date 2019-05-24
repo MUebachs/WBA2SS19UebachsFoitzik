@@ -16,7 +16,7 @@ app.use(express.json());
 //Verb:GET / gibt alle Arbeitskräfte der Datenbank aus
 
 app.get("/worker", function(request, response){
-  //response.json("Hier eine Liste mit allen eingetragenen Arbeitern.");
+
   var docList= [];
   var worker = db.collection('worker').get().then((snapshot) => {
     snapshot.forEach((doc) => {
@@ -53,21 +53,47 @@ app.get("/worker/:id", function(request,response){
 });
 
 
-  //response.end(JSON.stringify("Hier ist ein bestimmter Arbeiter mit der ID: " + request.params.id + "."));
 //Verb: POST/ Erstellt neue Arbeitskraft
+
 app.post("/worker", function(request, response){
   var p = request.body;
-  db.collection('worker').doc(p.id).set({
-    "nachname"  : p.nachname,
-    "name"      : p.name,
-    "tZeit"     : p.tZeit,
-    "wZeit"     : p.wZeit,
-    "table"     : p.table
+  var tisch;
+
+  var tisch = db.collection('table').get()
+  .then((snapshot) => {
+    snapshot.forEach((doc) => {
+      if(doc.vergeben == False){
+        tisch=doc.id;
+      }
+    }
+    if(tisch>0){
+      db.collection('worker').doc(p.id).set({
+        "nachname"  : p.nachname,
+        "name"      : p.name,
+        "tZeit"     : p.tZeit,
+        "wZeit"     : p.wZeit,
+        "table"     : tisch
+      });
+    }
+    else{
+      db.collection('worker').doc(p.id).set({
+        "nachname"  : p.nachname,
+        "name"      : p.name,
+        "tZeit"     : p.tZeit,
+        "wZeit"     : p.wZeit
+      });
+    }
+  }
+
   });
+
+
+
   return response.send("Neue Arbeitskraft mit der ID " + p.id + " erstellt.");
 
 });
 //Verb: PATCH / Bearbeitet vorhandene arbeitskraft mit bestimmter ID
+
 app.patch("/worker/:id", function(request, response){
 
   var workerRef = db.collection('worker').doc(request.params.id);
@@ -106,6 +132,7 @@ app.patch("/worker/:id", function(request, response){
   return response.send("Arbeitskraft mit der ID" + request.params.id + "wurde angepasst.")
 })
 //Verb: DELETE / Löscht Nutzer mit bestimmter ID
+
 app.delete("/worker/:id", function(request, response){
 
   var workerRef = db.collection('worker').doc(request.params.id);
@@ -122,7 +149,7 @@ app.delete("/worker/:id", function(request, response){
 //Verb:GET / gibt alle Kunden der Datenbank aus
 
 app.get("/customer", function(request, response){
-  //response.json("Hier eine Liste mit allen eingetragenen Arbeitern.");
+
   var docList= [];
   var worker = db.collection('customer').get()
   .then((snapshot) => {
@@ -161,6 +188,7 @@ app.get("/customer/:id", function(request, response){
 });
 
 //Verb: POST/ Erstellt einen neuen Kunden
+
 app.post("/customer", function(request, response){
   var p = request.body;
   db.collection('worker').doc(p.id).set({
@@ -173,6 +201,7 @@ app.post("/customer", function(request, response){
 });
 
 //Verb: DELETE / Löscht Nutzer mit bestimmter ID
+
 app.delete("/customer/:id", function(request, response){
 
   var workerRef = db.collection('customer').doc(request.params.id);
@@ -186,8 +215,9 @@ app.delete("/customer/:id", function(request, response){
 //Ressource: reservation
 
 //Verb:GET / gibt alle Reservierungen der Datenbank aus
+
 app.get("/reservation", function(request, response){
-  //response.json("Hier eine Liste mit allen eingetragenen Arbeitern.");
+
   var docList= [];
   var worker = db.collection('reservation').get()
   .then((snapshot) => {
@@ -225,6 +255,7 @@ app.get("/reservation/:id", function(request, response){
 });
 
 //Verb: POST/ Erstellt einen neuen Kunden
+
 app.post("/reservation", function(request, response){
   var p = request.body;
   var newReserv;
@@ -256,12 +287,14 @@ else {
   .catch((err) => {
     response.json('Error getting documents', err);
   });
+
 }
   db.collection('reservation').doc(p.id).set(newReserv);
   return response.send("Neue Reservierung mit der ID " + p.id + " erstellt.");
 });
 
 //Verb: PATCH / Bearbeitet vorhandene arbeitskraft mit bestimmter ID
+
 app.patch("/reservation/:id", function(request, response){
 
   var reservRef = db.collection('reservation').doc(request.params.id);
@@ -271,15 +304,15 @@ app.patch("/reservation/:id", function(request, response){
     .then(doc => {
 
       if(request.body.datum != null){
-        t.update(workerRef, {datum: request.body.datum});
+        t.update(reservRef, {datum: request.body.datum});
       }
 
       if(request.body.kunde != null){
-        t.update(workerRef, {kunde: request.body.kunde});
+        t.update(reservRef, {kunde: request.body.kunde});
       }
 
       if(request.body.tisch != null){
-        t.update(workerRef, {tisch: request.body.tisch});
+        t.update(reservRef, {tisch: request.body.tisch});
       }
 
     });
@@ -293,6 +326,7 @@ app.patch("/reservation/:id", function(request, response){
 })
 
 //Verb: DELETE / Löscht Reservierung mit bestimmter ID
+
 app.delete("/reservation/:id", function(request, response){
 
   var reservRef = db.collection('reservation').doc(request.params.id);
@@ -306,10 +340,10 @@ app.delete("/reservation/:id", function(request, response){
 //Ressource: table
 
 //Verb:GET / gibt alle Reservierungen der Datenbank aus
+
 app.get("/table", function(request, response){
-  //response.json("Hier eine Liste mit allen eingetragenen Arbeitern.");
   var docList= [];
-  var worker = db.collection('table').get()
+  var table = db.collection('table').get()
   .then((snapshot) => {
     snapshot.forEach((doc) => {
 
@@ -345,17 +379,18 @@ app.get("/table/:id", function(request, response){
 });
 
 //Verb: POST/ Erstellt einen neuen Tisch
+
 app.post("/table", function(request, response){
   var p = request.body;
   db.collection('table').doc(p.id).set({
-    "reservation"  : p.datum,
-    "kunde"      : p.kunde
+    "vergeben" : False
   });
 
   return response.send("Neuer Tisch mit der ID " + p.id + " erstellt.");
 });
 
 //Verb: PATCH / Bearbeitet vorhandene arbeitskraft mit bestimmter ID
+
 app.patch("/table/:id", function(request, response){
 
   var tableRef = db.collection('table').doc(request.params.id);
@@ -365,11 +400,11 @@ app.patch("/table/:id", function(request, response){
     .then(doc => {
 
       if(request.body.datum != null){
-        t.update(workerRef, {datum: request.body.datum});
+        t.update(tableRef, {datum: request.body.datum});
       }
 
       if(request.body.kunde != null){
-        t.update(workerRef, {kunde: request.body.kunde});
+        t.update(tableRef, {kunde: request.body.kunde});
       }
 
     });
@@ -383,10 +418,11 @@ app.patch("/table/:id", function(request, response){
 })
 
 //Verb: DELETE / Löscht Reservierung mit bestimmter ID
+
 app.delete("/table/:id", function(request, response){
 
-  var reservRef = db.collection('table').doc(request.params.id);
-  var getDoc = reservRef.delete();
+  var tableRef = db.collection('table').doc(request.params.id);
+  var getDoc = tableRef.delete();
 
   return response.send("Lösche Reservierung mit der ID" + request.params.id + ".");
 });
