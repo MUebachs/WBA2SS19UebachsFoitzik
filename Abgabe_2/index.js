@@ -59,12 +59,14 @@ app.post("/worker", function(request, response){
   var p = request.body;
   var tisch;
 
-  var tisch = db.collection('table').get()
+  tisch = db.collection('table').get()
   .then((snapshot) => {
     snapshot.forEach((doc) => {
-      if(doc.vergeben == False){
+      if(doc.data().vergeben == false){
         tisch=doc.id;
+
       }
+      console.log(doc.data());
     });
     if(tisch>0){
       db.collection('worker').doc(p.id).set({
@@ -382,7 +384,7 @@ app.get("/table/:id", function(request, response){
 app.post("/table", function(request, response){
   var p = request.body;
   db.collection('table').doc(p.id).set({
-    "vergeben" : False
+    "vergeben" : false
   });
 
   return response.send("Neuer Tisch mit der ID " + p.id + " erstellt.");
